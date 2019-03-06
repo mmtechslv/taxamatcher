@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+import click
+import taxamatcher.tm_handler as tm
+
+CONTEXT_SETTINGS = dict(ignore_unknown_options=True)
+
+def print_help(ctx,param,value):
+    if value:
+        click.echo(ctx.get_help())
+        ctx.exit()
+    return
+    
+@click.version_option(version=1.0)
+
+@click.command()
+@click.option('--reference-type', '-r','ref_type',type=click.Choice(["gg", "silva"]),help="Name of reference taxonomic classification database")
+@click.option('--map-path', '-m','ref_path',type=click.Path(resolve_path=True), help="Path to the map file with reference taxonomy")
+@click.option('--target-path', '-t','target_path',type=click.Path(resolve_path=True),help="Path to the target file with taxon IDs and corresponding lineages")
+@click.option('--output-path', '-o','output_path',type=click.Path(resolve_path=True),help="Path to output file with correlations")
+@click.pass_context
+def main(ctx,ref_type=False,ref_path=False,target_path=False,output_path=False):
+    """
+    Correlates target taxonomy(i.e consensus lineages) with a reference taxonomy such as Greengeens, SILVA, etc.
+    
+    \b
+    Author: Farid MUSA (farid.musa.h@gmail.com)
+    
+    Currently available taxonomic classifications
+        gg - for Greengenes taxonomy
+        silva - for SILVA taxonomy
+    """
+    if not (ref_type or ref_path or target_path or output_path):    
+        print_help(ctx,None,True)
+    
+    if ref_type == 'gg':
+        msgs, error = tm.get_greengenes(ref_path,target_path,output_path)
+    elif ref_type == 'silva':
+        msgs, error = tm.get_silva(ref_path,target_path,output_path)
+    else:
+        error = 'TPE-1'
+    
+    if error:
+        click.echo(tm.error_handler(error))
+        ctx.exit()
+    else:
+        for msg in msgs:
+            click.echo(msg)
+    
+    return
+        
+if __name__ == "__main__":
+    main()
