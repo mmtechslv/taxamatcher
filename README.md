@@ -6,7 +6,7 @@ taxamatcher is an easy to use tool for assigning taxon IDs of reference taxonomy
 - SILVA
 
 # Installation
-    $ pip install taxmatcher
+    $ pip install taxamatcher
     
 # Usage
     $ taxamatcher -r [gg or silva] -m [ref-map-file] -t [my-lineages].csv -o [output].csv
